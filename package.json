@@ -1,0 +1,18 @@
+{
+  "name": "game-of-life",
+  "version": "1.0.0",
+  "repository": "https://github.com/Jighdan/game-of-life.git",
+  "author": "Reinny <reynsth@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "webpack --watch",
+    "build": "webpack && yarn build:sass",
+    "dev:sass": "sass ./src/style/index.scss ./build/style.css --no-source-map --watch",
+    "build:sass": "sass ./src/style/index.scss ./build/style.css"
+  },
+  "dependencies": {
+    "typescript": "^4.2.3",
+    "webpack": "^5.30.0",
+    "webpack-cli": "^4.6.0"
+  }
+}
