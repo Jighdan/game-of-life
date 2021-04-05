@@ -60,13 +60,6 @@ const cell = {
 
     return 0;
   },
-
-  render(): HTMLElement {
-    const element = document.createElement("div");
-    element.classList.add("cell");
-
-    return element;
-  },
 };
 
 export { cell };

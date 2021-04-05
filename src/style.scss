@@ -1,5 +1,5 @@
-$color-bg: #3c3e43;
-$color-front: #fcfcfd;
+$color-bg: rgba(60, 62, 67, 1);
+$color-front: rgba(252, 252, 253, 1);
 
 *,
 *::before,
@@ -16,8 +16,7 @@ html {
 }
 
 body,
-.main,
-#root {
+.main {
   height: 100%;
   width: 100%;
 }
@@ -32,15 +31,7 @@ body,
 }
 
 #root {
-  max-height: 500px;
-  max-width: 500px;
-  display: grid;
-}
-
-.cell {
-  border-collapse: collapse;
-
-  &[data-state="alive"] {
-    background-color: $color-front;
-  }
+  width: 100%;
+  height: 100%;
+  background: $color-bg;
 }

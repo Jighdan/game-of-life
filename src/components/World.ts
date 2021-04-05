@@ -1,57 +1,35 @@
 import { Generation } from "../models";
+import { Canvas } from "./Canvas";
 import { cell } from "./Cell";
 
 class World {
-  element: HTMLElement;
-  size: number;
+  element: Canvas;
+  size: Record<string, number>;
   nativityChance: number;
   generation: Generation;
 
-  constructor(element: HTMLElement, size: number, nativityChance: number) {
-    this.element = element;
+  constructor(
+    element: HTMLCanvasElement,
+    size: Record<string, number>,
+    nativityChance: number
+  ) {
+    this.element = new Canvas(element, size);
     this.size = size;
     this.nativityChance = nativityChance;
     this.generation = new Array();
-
-    const gridTemplate = `repeat(${this.size}, auto)`;
-    this.element.style.gridTemplateColumns = gridTemplate;
-    this.element.style.gridTemplateRows = gridTemplate;
   }
 
   private initializeGeneration(): void {
-    for (let iteration = 0; iteration < this.size; iteration++) {
-      this.generation.push(new Array(this.size));
+    for (let iteration = 0; iteration < this.size.height; iteration++) {
+      this.generation.push(new Array(this.size.width));
     }
   }
 
   private populateGeneration(): void {
-    for (let verticalAxis = 0; verticalAxis < this.size; verticalAxis++) {
-      for (
-        let horizontalAxis = 0;
-        horizontalAxis < this.size;
-        horizontalAxis++
-      ) {
+    for (let columnIndex = 0; columnIndex < this.size.height; columnIndex++) {
+      for (let rowIndex = 0; rowIndex < this.size.width; rowIndex++) {
         const cellState = Math.random() < this.nativityChance ? 1 : 0;
-        this.generation[verticalAxis][horizontalAxis] = cellState;
-      }
-    }
-  }
-
-  private renderGeneration(): void {
-    const cellElements: NodeListOf<HTMLDivElement> = document.querySelectorAll(
-      "div.cell"
-    );
-    for (let verticalAxis = 0; verticalAxis < this.size; verticalAxis++) {
-      for (
-        let horizontalAxis = 0;
-        horizontalAxis < this.size;
-        horizontalAxis++
-      ) {
-        const cellElementIndex = horizontalAxis * this.size + verticalAxis;
-        const cellState = this.generation[verticalAxis][horizontalAxis];
-        const cellTypeState = cellState === 1 ? "alive" : "dead";
-
-        cellElements[cellElementIndex].dataset.state = cellTypeState;
+        this.generation[columnIndex][rowIndex] = cellState;
       }
     }
   }
@@ -59,38 +37,30 @@ class World {
   private getNextGeneration(): Generation {
     const nextGeneration = [...this.generation];
 
-    for (let verticalAxis = 0; verticalAxis < this.size; verticalAxis++) {
-      for (
-        let horizontalAxis = 0;
-        horizontalAxis < this.size;
-        horizontalAxis++
-      ) {
-        const cellState = cell.getNextEvolutionState(this.generation, {
-          y: verticalAxis,
-          x: horizontalAxis,
-        });
-        nextGeneration[verticalAxis][horizontalAxis] = cellState;
+    for (let columnIndex = 0; columnIndex < this.size.height; columnIndex++) {
+      for (let rowIndex = 0; rowIndex < this.size.width; rowIndex++) {
+        const cellCoordinate = { y: columnIndex, x: rowIndex };
+        const cellState = cell.getNextEvolutionState(
+          this.generation,
+          cellCoordinate
+        );
+        nextGeneration[columnIndex][rowIndex] = cellState;
       }
     }
 
     return nextGeneration;
   }
 
-  public initializeWorld(): void {
+  public initialize(): void {
     this.initializeGeneration();
     this.populateGeneration();
-
-    const flatGeneration = this.generation.flat(2);
-    const renderedCells = flatGeneration.map(() => cell.render());
-
-    this.element.append(...renderedCells);
-    this.renderGeneration();
+    this.element.drawWorld(this.generation);
   }
 
   public async evoluteWorld(): Promise<void> {
     const nextGeneration = await this.getNextGeneration();
     this.generation = nextGeneration;
-    this.renderGeneration();
+    this.element.drawWorld(this.generation);
   }
 }
 
