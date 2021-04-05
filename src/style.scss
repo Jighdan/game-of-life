@@ -1,0 +1,46 @@
+$color-bg: #3c3e43;
+$color-front: #fcfcfd;
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  height: 100vh;
+  width: 100vw;
+  background-color: $color-bg;
+}
+
+body,
+.main,
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1.25rem;
+  row-gap: 1.25rem;
+}
+
+#root {
+  max-height: 500px;
+  max-width: 500px;
+  display: grid;
+}
+
+.cell {
+  border-collapse: collapse;
+
+  &[data-state="alive"] {
+    background-color: $color-front;
+  }
+}
