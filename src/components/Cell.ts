@@ -1,28 +1,51 @@
-import { Generation } from "../model/generation";
+import { Generation, Coordinate } from "../models";
 
 const cell = {
-  isCellIndexWithinBounds(worldSize: number, cellIndex: number): boolean {
-    return cellIndex >= 0 && cellIndex < worldSize;
+  isIndexWithinBounds(worldSize: number, index: number): boolean {
+    return index >= 0 && index < worldSize;
   },
 
-  getAmountOfNeighbors(generation: Generation, cellIndex: number): number {
-    const neighborhoodOffsets = [-8, 8, -1, 1, -7, 7, -9, 9];
-    let aliveNeighbors = 0;
+  getAmountOfNeighbors(generation: Generation, cellIndex: Coordinate): number {
+    const neighbors: Record<string, Coordinate> = {
+      north: { y: cellIndex.y - 1, x: cellIndex.x },
+      south: { y: cellIndex.y + 1, x: cellIndex.x },
+      west: { y: cellIndex.y, x: cellIndex.x - 1 },
+      east: { y: cellIndex.y, x: cellIndex.x + 1 },
+      southEast: { y: cellIndex.y + 1, x: cellIndex.x + 1 },
+      northWest: { y: cellIndex.y - 1, x: cellIndex.x - 1 },
+      southWest: { y: cellIndex.y + 1, x: cellIndex.x - 1 },
+      northEast: { y: cellIndex.y - 1, x: cellIndex.x + 1 },
+    };
 
-    neighborhoodOffsets.forEach((offset) => {
-      const neighborCell = generation[cellIndex + offset];
-      if (neighborCell === 1) {
-        aliveNeighbors += 1;
+    let amountOfLivingNeighbors = 0;
+
+    Object.keys(neighbors).forEach((neighborCoordinateKey) => {
+      const neighbor = neighbors[neighborCoordinateKey];
+      const isNeighborWithinBounds =
+        this.isIndexWithinBounds(generation.length, neighbor.y) &&
+        this.isIndexWithinBounds(generation.length, neighbor.x);
+
+      if (isNeighborWithinBounds) {
+        const neighborState = generation[neighbor.y][neighbor.x];
+        if (neighborState === 1) {
+          amountOfLivingNeighbors++;
+        }
       }
     });
 
-    return aliveNeighbors;
+    return amountOfLivingNeighbors;
   },
 
-  getNextEvolutionState(generation: Generation, cellIndex: number): 1 | 0 {
-    const numberOfNeighbors = this.getAmountOfNeighbors(generation, cellIndex);
+  getNextEvolutionState(
+    generation: Generation,
+    cellCoordinate: Coordinate
+  ): 1 | 0 {
+    const numberOfNeighbors = this.getAmountOfNeighbors(
+      generation,
+      cellCoordinate
+    );
 
-    const isCellAlive = generation[cellIndex] === 1;
+    const isCellAlive = generation[cellCoordinate.y][cellCoordinate.x] === 1;
     const isNumberOfNeighborsTwoOrThree =
       numberOfNeighbors === 2 || numberOfNeighbors === 3;
     const isNumberOfNeighborsThree = numberOfNeighbors === 3;
