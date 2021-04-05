@@ -1,2 +1,4 @@
 node_modules/
-build/
+static/script.js
+static/style.css
+static/style.css.map

@@ -7,8 +7,8 @@
   "scripts": {
     "dev": "webpack --watch",
     "build": "webpack && yarn build:sass",
-    "dev:sass": "sass ./src/style.scss ./build/style.css --no-source-map --watch",
-    "build:sass": "sass ./src/style.scss ./build/style.css"
+    "dev:sass": "sass ./src/style.scss ./static/style.css --no-source-map --watch",
+    "build:sass": "sass ./src/style.scss ./static/style.css"
   },
   "dependencies": {
     "sass": "^1.32.8",
