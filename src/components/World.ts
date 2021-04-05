@@ -1,60 +1,66 @@
-import { Generation } from "../model/generation";
+import { Generation } from "../models";
+import { Canvas } from "./Canvas";
 import { cell } from "./Cell";
 
 class World {
-  element: HTMLElement;
-  size: number;
+  element: Canvas;
+  size: Record<string, number>;
+  nativityChance: number;
   generation: Generation;
 
-  constructor(element: HTMLElement, size: number) {
-    this.element = element;
+  constructor(
+    element: HTMLCanvasElement,
+    size: Record<string, number>,
+    nativityChance: number
+  ) {
+    this.element = new Canvas(element, size);
     this.size = size;
-    this.generation = new Array(this.size);
+    this.nativityChance = nativityChance;
+    this.generation = new Array();
   }
 
-  private populateGeneration(): void {
-    for (let spaceIndex = 0; spaceIndex < this.size; spaceIndex++) {
-      const cellState = Math.random() < 0.5 ? 1 : 0;
-      this.generation[spaceIndex] = cellState;
+  private initializeGeneration(): void {
+    for (let iteration = 0; iteration < this.size.height; iteration++) {
+      this.generation.push(new Array(this.size.width));
     }
   }
 
-  private renderGeneration(): void {
-    const cellElements: NodeListOf<HTMLDivElement> = document.querySelectorAll(
-      "div.cell"
-    );
-    for (let spaceIndex = 0; spaceIndex < this.size; spaceIndex++) {
-      const cellState = this.generation[spaceIndex];
-      const cellTypeState = cellState === 1 ? "alive" : "dead";
-
-      cellElements[spaceIndex].dataset.state = cellTypeState;
+  private populateGeneration(): void {
+    for (let columnIndex = 0; columnIndex < this.size.height; columnIndex++) {
+      for (let rowIndex = 0; rowIndex < this.size.width; rowIndex++) {
+        const cellState = Math.random() < this.nativityChance ? 1 : 0;
+        this.generation[columnIndex][rowIndex] = cellState;
+      }
     }
   }
 
   private getNextGeneration(): Generation {
-    const nextGeneration = new Array(this.size);
+    const nextGeneration = [...this.generation];
 
-    for (let cellIndex = 0; cellIndex < this.size; cellIndex++) {
-      const cellState = cell.getNextEvolutionState(this.generation, cellIndex);
-
-      nextGeneration[cellIndex] = cellState;
+    for (let columnIndex = 0; columnIndex < this.size.height; columnIndex++) {
+      for (let rowIndex = 0; rowIndex < this.size.width; rowIndex++) {
+        const cellCoordinate = { y: columnIndex, x: rowIndex };
+        const cellState = cell.getNextEvolutionState(
+          this.generation,
+          cellCoordinate
+        );
+        nextGeneration[columnIndex][rowIndex] = cellState;
+      }
     }
 
     return nextGeneration;
   }
 
-  public initializeWorld(): void {
+  public initialize(): void {
+    this.initializeGeneration();
     this.populateGeneration();
-    const cells = this.generation.map(() => cell.render());
-    this.element.append(...cells);
-    this.renderGeneration();
+    this.element.drawWorld(this.generation);
   }
 
-  public evoluteWorld(): void {
-    const nextGeneration = this.getNextGeneration();
+  public async evoluteWorld(): Promise<void> {
+    const nextGeneration = await this.getNextGeneration();
     this.generation = nextGeneration;
-
-    this.renderGeneration();
+    this.element.drawWorld(this.generation);
   }
 }
 
