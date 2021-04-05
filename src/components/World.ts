@@ -82,7 +82,6 @@ class World {
 
     const flatGeneration = this.generation.flat(2);
     const renderedCells = flatGeneration.map(() => cell.render());
-    console.log({ renderedCells });
 
     this.element.append(...renderedCells);
     this.renderGeneration();
