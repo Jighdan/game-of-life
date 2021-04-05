@@ -4,13 +4,13 @@ import { cell } from "./Cell";
 class World {
   element: HTMLElement;
   size: number;
-  randomPopulationChance: number;
+  nativityChance: number;
   generation: Generation;
 
-  constructor(element: HTMLElement, size: number) {
+  constructor(element: HTMLElement, size: number, nativityChance: number) {
     this.element = element;
     this.size = size;
-    this.randomPopulationChance = 0.2;
+    this.nativityChance = nativityChance;
     this.generation = new Array();
 
     const gridTemplate = `repeat(${this.size}, auto)`;
@@ -31,7 +31,7 @@ class World {
         horizontalAxis < this.size;
         horizontalAxis++
       ) {
-        const cellState = Math.random() < this.randomPopulationChance ? 1 : 0;
+        const cellState = Math.random() < this.nativityChance ? 1 : 0;
         this.generation[verticalAxis][horizontalAxis] = cellState;
       }
     }
